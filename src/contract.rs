@@ -40,4 +40,76 @@ pub fn instantiate(
     };
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
     GLOBAL_STATE.save(deps.storage, &global_state)?;
+
+    OK(Response::new()
+        .add_attribute("method", "instantiate")
+        .add_attribute("owner", msg.owner.to_string()))
+}
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn execute(
+    deps: DepsMut,
+    env: Env,
+    info: MessageInfo,
+    msg: ExecuteMsg
+) -> Result<Response, ContractError> {
+    match msg {
+        ExecuteMsg::ReceiveNft { sender, token_id, msg } => try_receive_nft(deps, env, info, sender, token_id, msg),
+    }
+}
+
+// Pseudo-code for CW721 receiver function
+pub fn try_receive_nft(
+    _deps: DepsMut,
+    _env: Env,
+    _info: MessageInfo,
+    // Parameters might include the sender address, token ID, and any additional data
+    _sender: String,
+    token_id: String,
+    _msg: Binary,
+) -> Result<Response, ContractError> {
+
+    // Logic to handle the received NFT, such as setting it as the prize for the raffle
+
+    // Additional logic as necessary, for example, parsing `msg` for any specific instructions
+
+    Ok(Response::new().add_attribute("action", "receive_nft").add_attribute("token_id", token_id))
+}
+
+fn try_start_raffle(
+    deps: DepsMut,
+    env: Env,
+    info: MessageInfo,
+    msg: ExecuteMsg,
+    icket_price: u64,
+    total_ticket_count: u64,
+    nft_contract_addr: Addr,
+    nft_token_id: String,
+    collection_wallet: Addr,
+    end_time: u64
+) -> Result<Response, ContractError> {
+    let mut global_state = GLOBAL_STATE.load(deps.storage)?;
+    //Check
+    if info.sender != global_state.owner {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    if !can_transfer_nft(&deps.querier, nft_contract_addr.clone(), nft_token_id.clone(), env.contract.address)? {
+        return Err(ContractError::CantAccessPrize {});
+    }
+}
+
+fn can_transfer_nft(querier: &QuerierWrapper, nft_contract_addr: Addr, nft_token_id: String, operator: Addr) -> StdResult<bool> {
+    // Adjusted query to fetch ownership information
+    let owner_response: OwnerOfResponse = querier.query(&QueryRequest::Wasm(WasmQuery::Smart {
+        contract_addr: nft_contract_addr.into_string(),
+        msg: to_json_binary(&Cw721QueryMsg::OwnerOf {
+            token_id: nft_token_id,
+            // Include field for including expired items of not, based on your contract's requirements
+            include_expired: None, // This parameter depends on your CW721 version's API
+        })?,
+    }))?;
+
+    // Check if the contract is the owner or has been approved
+    OK(owner_response.owner == operator || owner_response.approvals.iter(.any(|approval| approval.spender == operator)))
 }

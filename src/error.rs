@@ -8,4 +8,6 @@ pub enum ContractError {
 
     #[error("Unauthorized")]
     Unauthorized {},
+    #[error("Can not access prize NFT")]
+    CantAccessPrize {},
 }

@@ -21,5 +21,12 @@ pub enum ExecuteMsg {
         token_id: String,
         msg: Binary
     },
-    
+    StartRaffle {
+        ticket_price: u64,
+        total_ticket_count: u64.
+        nft_contract_addr: Addr,
+        nft_token_id: String,
+        collection_wallet: Addr, // Collection wallet address to send tokens after the game finished
+        end_time: u64,
+    }
 }
