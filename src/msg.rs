@@ -1,27 +1,25 @@
-use cosmwasm_schema::{cw_serde, QueryResponses};
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
-#[cw_serde]
-pub struct InstantiateMsg {% raw %}{{% endraw %}{% unless minimal %}
-    pub count: i32,
-{% endunless %}}
+use cosmwasm_std::Addr;
+use cosmwasm_std::Binary;
+use cosmwasm_std::Coin;
 
-#[cw_serde]
-pub enum ExecuteMsg {% raw %}{{% endraw %}{% unless minimal %}
-    Increment {},
-    Reset { count: i32 },
-{% endunless %}}
+use crate::state::GameState;
 
-#[cw_serde]
-#[derive(QueryResponses)]
-pub enum QueryMsg {% raw %}{{% endraw %}{% unless minimal %}
-    // GetCount returns the current count as a json-encoded number
-    #[returns(GetCountResponse)]
-    GetCount {},
-{% endunless %}}
-{% unless minimal %}
-// We define a custom struct for each query response
-#[cw_serde]
-pub struct GetCountResponse {
-    pub count: i32,
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct InstantiateMsg {
+    pub authkey: String,
+    pub owner: Addr
 }
-{% endunless %}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+#[serde(rename_all = "snake_case")]
+pub enum ExecuteMsg {
+    ReceiveNft {
+        sender:  String,
+        token_id: String,
+        msg: Binary
+    },
+    
+}
