@@ -28,5 +28,8 @@ pub enum ExecuteMsg {
         nft_token_id: String,
         collection_wallet: Addr, // Collection wallet address to send tokens after the game finished
         end_time: u64,
-    }
+    },
+    EnterRaffle {
+        game_id: u64
+    },
 }
