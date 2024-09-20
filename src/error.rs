@@ -10,4 +10,14 @@ pub enum ContractError {
     Unauthorized {},
     #[error("Can not access prize NFT")]
     CantAccessPrize {},
+    #[error("Raffle already ended")]
+    RaffleEnded {},
+    #[error("Raffle Time Over")]
+    RaffleTimeOver {},
+    #[error("Raffle Time Over")]
+    RaffleTimeOver {},
+    #[error("All raffle tickets was sold.")]
+    RaffleSoldOut {},
+    #[error("Incorrect Funds")]
+    IncorrectFunds {},
 }
