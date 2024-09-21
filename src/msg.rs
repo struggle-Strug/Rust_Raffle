@@ -32,4 +32,10 @@ pub enum ExecuteMsg {
     EnterRaffle {
         game_id: u64
     },
+    TransferTokensToCollectionWallet {
+        amount: u128,
+        denom: String,
+        collection_wallet_address: String,
+    },
+    SelectWinnerAndTransferNFTtoWinner { game_id: u64 },
 }

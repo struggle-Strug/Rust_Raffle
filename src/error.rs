@@ -20,4 +20,6 @@ pub enum ContractError {
     RaffleSoldOut {},
     #[error("Incorrect Funds")]
     IncorrectFunds {},
+    #[error("Wrong Game Id")]
+    WrongGameId {},
 }
